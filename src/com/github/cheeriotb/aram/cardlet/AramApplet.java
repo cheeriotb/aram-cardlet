@@ -22,6 +22,7 @@ import javacard.framework.APDU;
 import javacard.framework.Applet;
 import javacard.framework.ISO7816;
 import javacard.framework.ISOException;
+import javacard.framework.Util;
 
 public class AramApplet extends Applet {
     private static final short DATA_BUFFER_SIZE = 0x100;
@@ -50,6 +51,46 @@ public class AramApplet extends Applet {
     };
 
     private static final byte INS_GET_RESPONSE = (byte) 0xC0;
+
+    private static final byte[] RESPONSE_ALL_REF_AR_DO = {
+        /*
+           |Response-ALL-REF-AR-DO|T|FF40|
+           |                      |L|31  |
+        */
+        (byte) 0xFF, (byte) 0x40, (byte) 0x31,
+
+        /*
+           REF-AR-DO for UICC Carrier Privileges
+
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|1E                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|06                                      |
+           |         | |      | |                  |V|FFFFFFFFFFFF                            |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|61ED377E85D386A8DFEE6B864BD85B0BFAA5AF81|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|0D                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |         | |      | |PERM-AR-DO        |T|DB                                      |
+           |         | |      | |                  |L|08                                      |
+           |         | |      | |                  |V|0000000000000001                        |
+        */
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x1E, (byte) 0x4F, (byte) 0x06,
+        (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+        (byte) 0xC1, (byte) 0x14, (byte) 0x61, (byte) 0xED, (byte) 0x37, (byte) 0x7E,
+        (byte) 0x85, (byte) 0xD3, (byte) 0x86, (byte) 0xA8, (byte) 0xDF, (byte) 0xEE,
+        (byte) 0x6B, (byte) 0x86, (byte) 0x4B, (byte) 0xD8, (byte) 0x5B, (byte) 0x0B,
+        (byte) 0xFA, (byte) 0xA5, (byte) 0xAF, (byte) 0x81, (byte) 0xE3, (byte) 0x0D,
+        (byte) 0xD0, (byte) 0x01, (byte) 0x01, (byte) 0xDB, (byte) 0x08, (byte) 0x00,
+        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+        (byte) 0x01
+    };
 
     private byte mCurrentClass = 0x00;
     private byte[] mOutgoingData = null;
