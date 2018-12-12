@@ -51,6 +51,10 @@ public class AramApplet extends Applet {
     };
 
     private static final byte INS_GET_RESPONSE = (byte) 0xC0;
+    private static final byte INS_GET_DATA     = (byte) 0xCA;
+
+    private static final short GET_DATA_ALL         = (short) 0xFF40;
+    private static final short GET_DATA_NEXT        = (short) 0xFF60;
 
     private static final byte[] RESPONSE_ALL_REF_AR_DO = {
         /*
@@ -96,6 +100,9 @@ public class AramApplet extends Applet {
     private byte[] mOutgoingData = null;
     private short mDataOffset = 0;
 
+    private short mRemainingData = 0;
+    private boolean mIsGetDataAllInProgress = false;
+
     private AramApplet() {
     }
 
@@ -111,8 +118,7 @@ public class AramApplet extends Applet {
         byte p2 = buffer[ISO7816.OFFSET_P2];
 
         if (selectingApplet()) {
-            byte[] response;
-
+            byte[] response = null;
             switch (p2 & 0x0C) {
                 case TEMPLATE_FCI:
                     response = SELECT_RESPONSE_FCI;
@@ -133,7 +139,6 @@ public class AramApplet extends Applet {
                     ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
                     return;
             }
-
             initiateOutgoingCase4(cla, response);
             return;
         }
@@ -152,10 +157,45 @@ public class AramApplet extends Applet {
                 }
                 break;
 
+            case INS_GET_DATA:
+                // Only Global Platform command is supported.
+                if ((cla & 0x80) != 0x80) {
+                    ISOException.throwIt(ISO7816.SW_CLA_NOT_SUPPORTED);
+                }
+                switch (Util.getShort(buffer, (short) ISO7816.OFFSET_P1)) {
+                    case GET_DATA_ALL:
+                        mRemainingData = (short) RESPONSE_ALL_REF_AR_DO.length;
+                        initiateOutgoingCase2(apdu, RESPONSE_ALL_REF_AR_DO, (short) 0);
+                        break;
+                    case GET_DATA_NEXT:
+                        if (mRemainingData == 0) {
+                            ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
+                        }
+                        initiateOutgoingCase2(apdu, RESPONSE_ALL_REF_AR_DO,
+                            (short) (RESPONSE_ALL_REF_AR_DO.length - mRemainingData));
+                        break;
+                    default:
+                        ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
+                        break;
+                }
+                break;
+
             default:
                 ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
                 break;
         }
+    }
+
+    private void initiateOutgoingCase2(APDU apdu, byte[] data, short offset)
+            throws ISOException {
+        byte[] command = apdu.getBuffer();
+
+        mCurrentClass = command[ISO7816.OFFSET_CLA];
+        mOutgoingData = data;
+        mDataOffset = offset;
+        mIsGetDataAllInProgress = true;
+
+        processOutgoingCase2(apdu);
     }
 
     private void processOutgoingCase2(APDU apdu) throws ISOException {
@@ -163,7 +203,7 @@ public class AramApplet extends Applet {
         short available = (DATA_BUFFER_SIZE < remaining) ? DATA_BUFFER_SIZE : remaining;
 
         byte[] command = apdu.getBuffer();
-        short expected = command[ISO7816.OFFSET_LC];
+        short expected = (short) (command[ISO7816.OFFSET_LC] & 0xFF);
         if (expected == 0x00) {
             expected = DATA_BUFFER_SIZE;
         }
@@ -175,15 +215,20 @@ public class AramApplet extends Applet {
         }
 
         apdu.setOutgoing();
-        apdu.setOutgoingLength(available);
-        apdu.sendBytesLong(mOutgoingData, mDataOffset, available);
+        apdu.setOutgoingLength(expected);
+        apdu.sendBytesLong(mOutgoingData, mDataOffset, expected);
 
-        if ((remaining -= available) > 0) {
-            mDataOffset += available;
-            // Return SW 61xx if remaining outgoing data exists after sending outgoing data.
-            ISOException.throwIt((short) (ISO7816.SW_BYTES_REMAINING_00
-                    + ((remaining < DATA_BUFFER_SIZE) ? remaining : (short) 0x00)));
+        if (!mIsGetDataAllInProgress) {
+            if ((remaining -= expected) > 0) {
+                mDataOffset += expected;
+                // Return SW 61xx if remaining outgoing data exists after sending outgoing data.
+                ISOException.throwIt((short) (ISO7816.SW_BYTES_REMAINING_00
+                        + ((remaining < DATA_BUFFER_SIZE) ? remaining : (short) 0x00)));
+            } else {
+                clearOutgoingData();
+            }
         } else {
+            mRemainingData -= expected;
             clearOutgoingData();
         }
     }
@@ -208,6 +253,9 @@ public class AramApplet extends Applet {
         }
         if (mDataOffset != 0) {
             mDataOffset = 0;
+        }
+        if (mIsGetDataAllInProgress) {
+            mIsGetDataAllInProgress = false;
         }
     }
 }
