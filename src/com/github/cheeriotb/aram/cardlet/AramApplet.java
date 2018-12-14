@@ -55,6 +55,7 @@ public class AramApplet extends Applet {
 
     private static final short GET_DATA_ALL         = (short) 0xFF40;
     private static final short GET_DATA_NEXT        = (short) 0xFF60;
+    private static final short GET_DATA_REFRESH_TAG = (short) 0xDF20;
 
     private static final byte[] RESPONSE_ALL_REF_AR_DO = {
         /*
@@ -94,6 +95,16 @@ public class AramApplet extends Applet {
         (byte) 0xD0, (byte) 0x01, (byte) 0x01, (byte) 0xDB, (byte) 0x08, (byte) 0x00,
         (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
         (byte) 0x01
+    };
+
+    private static final byte[] RESPONSE_REFRESH_TAG_DO = {
+        /*
+           |Response-Refresh-Tag-DO|T|DF20            |
+           |                       |L|08              |
+           |                       |V|0123456789ABCDEF|
+        */
+        (byte) 0xDF, (byte) 0x20, (byte) 0x08, (byte) 0x01, (byte) 0x23, (byte) 0x45,
+        (byte) 0x67, (byte) 0x89, (byte) 0xAB, (byte) 0xCD, (byte) 0xEF
     };
 
     private byte mCurrentClass = 0x00;
@@ -164,6 +175,7 @@ public class AramApplet extends Applet {
                 }
                 switch (Util.getShort(buffer, (short) ISO7816.OFFSET_P1)) {
                     case GET_DATA_ALL:
+                        mIsGetDataAllInProgress = true;
                         mRemainingData = (short) RESPONSE_ALL_REF_AR_DO.length;
                         initiateOutgoingCase2(apdu, RESPONSE_ALL_REF_AR_DO, (short) 0);
                         break;
@@ -173,6 +185,9 @@ public class AramApplet extends Applet {
                         }
                         initiateOutgoingCase2(apdu, RESPONSE_ALL_REF_AR_DO,
                             (short) (RESPONSE_ALL_REF_AR_DO.length - mRemainingData));
+                        break;
+                    case GET_DATA_REFRESH_TAG:
+                        initiateOutgoingCase2(apdu, RESPONSE_REFRESH_TAG_DO, (short) 0);
                         break;
                     default:
                         ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
@@ -193,7 +208,6 @@ public class AramApplet extends Applet {
         mCurrentClass = command[ISO7816.OFFSET_CLA];
         mOutgoingData = data;
         mDataOffset = offset;
-        mIsGetDataAllInProgress = true;
 
         processOutgoingCase2(apdu);
     }
@@ -219,7 +233,7 @@ public class AramApplet extends Applet {
         apdu.sendBytesLong(mOutgoingData, mDataOffset, expected);
 
         if (!mIsGetDataAllInProgress) {
-            if ((remaining -= expected) > 0) {
+            if (((remaining -= expected) > 0) && (expected == DATA_BUFFER_SIZE)) {
                 mDataOffset += expected;
                 // Return SW 61xx if remaining outgoing data exists after sending outgoing data.
                 ISOException.throwIt((short) (ISO7816.SW_BYTES_REMAINING_00
