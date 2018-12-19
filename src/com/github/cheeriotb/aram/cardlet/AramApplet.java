@@ -59,10 +59,10 @@ public class AramApplet extends Applet {
 
     private static final byte[] RESPONSE_ALL_REF_AR_DO = {
         /*
-           |Response-ALL-REF-AR-DO|T|FF40|
-           |                      |L|31  |
+           |Response-ALL-REF-AR-DO|T|FF40  |
+           |                      |L|8206A8|
         */
-        (byte) 0xFF, (byte) 0x40, (byte) 0x31,
+        (byte) 0xFF, (byte) 0x40, (byte) 0x82, (byte) 0x06, (byte) 0xA8,
 
         /*
            REF-AR-DO for UICC Carrier Privileges
@@ -94,6 +94,913 @@ public class AramApplet extends Applet {
         (byte) 0xFA, (byte) 0xA5, (byte) 0xAF, (byte) 0x81, (byte) 0xE3, (byte) 0x0D,
         (byte) 0xD0, (byte) 0x01, (byte) 0x01, (byte) 0xDB, (byte) 0x08, (byte) 0x00,
         (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+        (byte) 0x01,
+
+        /*
+           REF-AR-DO for non-specific applications and applets
+
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|0B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|04                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+        */
+        (byte) 0xE2, (byte) 0x0B, (byte) 0xE1, (byte) 0x04, (byte) 0x4F, (byte) 0x00,
+        (byte) 0xC1, (byte) 0x00, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+
+        /*
+           REF-AR-DOs for the specific applets.
+           Accesses from those applets are basically prohibited.
+
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545340        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545341        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545342        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545343        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545344        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545345        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545346        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545347        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545348        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545349        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534A        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534B        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534C        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534D        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534E        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|1B    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|14                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534F        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|00 (Not Specified)                      |
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|00 (Never)                              |
+        */
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x40, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x41, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x42, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x43, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x44, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x45, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x46, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x47, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x48, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x49, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4A, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4B, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4C, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4D, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4E, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x1B, (byte) 0xE1, (byte) 0x14, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4F, (byte) 0xC1, (byte) 0x00,
+        (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01, (byte) 0x00,
+
+        /*
+           REF-AR-DOs with the specific APDU fileters for CtsSecureElementAccessControlTestCases1.
+
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|3E    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545340        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|12                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|00060000 / FFFF0000                     |
+           |         | |      | |                  | |A0060000 / FFFF0000                     |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|36    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545341        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|0A                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|08                                      |
+           |         | |      | |                  |V|94000000 / FF000000                     |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545342        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545344        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545345        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545347        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545348        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545349        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534A        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534B        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534C        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534D        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534E        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F69644354534F        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|4BBE31BEB2F753CFE71EC6BF112548687BB6C34E|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+        */
+        (byte) 0xE2, (byte) 0x3E, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x40, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x12, (byte) 0xD0, (byte) 0x10,
+        (byte) 0x00, (byte) 0x06, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0xFF,
+        (byte) 0x00, (byte) 0x00, (byte) 0xA0, (byte) 0x06, (byte) 0x00, (byte) 0x00,
+        (byte) 0xFF, (byte) 0xFF, (byte) 0x00, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x36, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x41, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x0A, (byte) 0xD0, (byte) 0x08,
+        (byte) 0x94, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0x00,
+        (byte) 0x00, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x42, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x44, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x45, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x47, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x48, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x49, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4A, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4B, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4C, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4D, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4E, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x4F, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x4B, (byte) 0xBE, (byte) 0x31, (byte) 0xBE, (byte) 0xB2, (byte) 0xF7,
+        (byte) 0x53, (byte) 0xCF, (byte) 0xE7, (byte) 0x1E, (byte) 0xC6, (byte) 0xBF,
+        (byte) 0x11, (byte) 0x25, (byte) 0x48, (byte) 0x68, (byte) 0x7B, (byte) 0xB6,
+        (byte) 0xC3, (byte) 0x4E, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+
+        /*
+           REF-AR-DOs with the specific APDU fileters for CtsSecureElementAccessControlTestCases2.
+
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|3E    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545340        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|93B0FF2260BABD4C2A92C68AAA0039DC514D8A33|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|12                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|00060000 / FFFF0000                     |
+           |         | |      | |                  | |A0060000 / FFFF0000                     |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|36    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545341        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|93B0FF2260BABD4C2A92C68AAA0039DC514D8A33|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|0A                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|08                                      |
+           |         | |      | |                  |V|94000000 / FF000000                     |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545343        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|93B0FF2260BABD4C2A92C68AAA0039DC514D8A33|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545345        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|93B0FF2260BABD4C2A92C68AAA0039DC514D8A33|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545346        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|93B0FF2260BABD4C2A92C68AAA0039DC514D8A33|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+        */
+        (byte) 0xE2, (byte) 0x3E, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x40, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x93, (byte) 0xB0, (byte) 0xFF, (byte) 0x22, (byte) 0x60, (byte) 0xBA,
+        (byte) 0xBD, (byte) 0x4C, (byte) 0x2A, (byte) 0x92, (byte) 0xC6, (byte) 0x8A,
+        (byte) 0xAA, (byte) 0x00, (byte) 0x39, (byte) 0xDC, (byte) 0x51, (byte) 0x4D,
+        (byte) 0x8A, (byte) 0x33, (byte) 0xE3, (byte) 0x12, (byte) 0xD0, (byte) 0x10,
+        (byte) 0x00, (byte) 0x06, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0xFF,
+        (byte) 0x00, (byte) 0x00, (byte) 0xA0, (byte) 0x06, (byte) 0x00, (byte) 0x00,
+        (byte) 0xFF, (byte) 0xFF, (byte) 0x00, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x36, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x41, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x93, (byte) 0xB0, (byte) 0xFF, (byte) 0x22, (byte) 0x60, (byte) 0xBA,
+        (byte) 0xBD, (byte) 0x4C, (byte) 0x2A, (byte) 0x92, (byte) 0xC6, (byte) 0x8A,
+        (byte) 0xAA, (byte) 0x00, (byte) 0x39, (byte) 0xDC, (byte) 0x51, (byte) 0x4D,
+        (byte) 0x8A, (byte) 0x33, (byte) 0xE3, (byte) 0x0A, (byte) 0xD0, (byte) 0x08,
+        (byte) 0x94, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0x00,
+        (byte) 0x00, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x43, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x93, (byte) 0xB0, (byte) 0xFF, (byte) 0x22, (byte) 0x60, (byte) 0xBA,
+        (byte) 0xBD, (byte) 0x4C, (byte) 0x2A, (byte) 0x92, (byte) 0xC6, (byte) 0x8A,
+        (byte) 0xAA, (byte) 0x00, (byte) 0x39, (byte) 0xDC, (byte) 0x51, (byte) 0x4D,
+        (byte) 0x8A, (byte) 0x33, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x45, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x93, (byte) 0xB0, (byte) 0xFF, (byte) 0x22, (byte) 0x60, (byte) 0xBA,
+        (byte) 0xBD, (byte) 0x4C, (byte) 0x2A, (byte) 0x92, (byte) 0xC6, (byte) 0x8A,
+        (byte) 0xAA, (byte) 0x00, (byte) 0x39, (byte) 0xDC, (byte) 0x51, (byte) 0x4D,
+        (byte) 0x8A, (byte) 0x33, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x46, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x93, (byte) 0xB0, (byte) 0xFF, (byte) 0x22, (byte) 0x60, (byte) 0xBA,
+        (byte) 0xBD, (byte) 0x4C, (byte) 0x2A, (byte) 0x92, (byte) 0xC6, (byte) 0x8A,
+        (byte) 0xAA, (byte) 0x00, (byte) 0x39, (byte) 0xDC, (byte) 0x51, (byte) 0x4D,
+        (byte) 0x8A, (byte) 0x33, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+
+        /*
+           REF-AR-DOs with the specific APDU fileters for CtsSecureElementAccessControlTestCases3.
+
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545340        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|5528CA826DA49D0D7329F8117481CCB27B8833AA|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|36    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545341        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|5528CA826DA49D0D7329F8117481CCB27B8833AA|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|0A                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|08                                      |
+           |         | |      | |                  |V|94000000 / FF000000                     |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545345        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|5528CA826DA49D0D7329F8117481CCB27B8833AA|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+           |REF-AR-DO|T|E2    | |                  | |                                        |
+           |         |L|2F    | |                  | |                                        |
+           |         |V|REF-DO|T|E1                | |                                        |
+           |         | |      |L|28                | |                                        |
+           |         | |      |V|AID-REF-DO        |T|4F                                      |
+           |         | |      | |                  |L|10                                      |
+           |         | |      | |                  |V|A000000476416E64726F696443545346        |
+           |         | |      | |DeviceAppID-REF-DO|T|C1                                      |
+           |         | |      | |                  |L|14                                      |
+           |         | |      | |                  |V|5528CA826DA49D0D7329F8117481CCB27B8833AA|
+           |         | |AR-DO |T|E3                | |                                        |
+           |         | |      |L|03                | |                                        |
+           |         | |      |V|APDU-AR-DO        |T|D0                                      |
+           |         | |      | |                  |L|01                                      |
+           |         | |      | |                  |V|01 (Always)                             |
+        */
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x40, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x55, (byte) 0x28, (byte) 0xCA, (byte) 0x82, (byte) 0x6D, (byte) 0xA4,
+        (byte) 0x9D, (byte) 0x0D, (byte) 0x73, (byte) 0x29, (byte) 0xF8, (byte) 0x11,
+        (byte) 0x74, (byte) 0x81, (byte) 0xCC, (byte) 0xB2, (byte) 0x7B, (byte) 0x88,
+        (byte) 0x33, (byte) 0xAA, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x36, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x41, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x55, (byte) 0x28, (byte) 0xCA, (byte) 0x82, (byte) 0x6D, (byte) 0xA4,
+        (byte) 0x9D, (byte) 0x0D, (byte) 0x73, (byte) 0x29, (byte) 0xF8, (byte) 0x11,
+        (byte) 0x74, (byte) 0x81, (byte) 0xCC, (byte) 0xB2, (byte) 0x7B, (byte) 0x88,
+        (byte) 0x33, (byte) 0xAA, (byte) 0xE3, (byte) 0x0A, (byte) 0xD0, (byte) 0x08,
+        (byte) 0x94, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0x00,
+        (byte) 0x00, (byte) 0x00,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x45, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x55, (byte) 0x28, (byte) 0xCA, (byte) 0x82, (byte) 0x6D, (byte) 0xA4,
+        (byte) 0x9D, (byte) 0x0D, (byte) 0x73, (byte) 0x29, (byte) 0xF8, (byte) 0x11,
+        (byte) 0x74, (byte) 0x81, (byte) 0xCC, (byte) 0xB2, (byte) 0x7B, (byte) 0x88,
+        (byte) 0x33, (byte) 0xAA, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
+        (byte) 0x01,
+        (byte) 0xE2, (byte) 0x2F, (byte) 0xE1, (byte) 0x28, (byte) 0x4F, (byte) 0x10,
+        (byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x76, (byte) 0x41,
+        (byte) 0x6E, (byte) 0x64, (byte) 0x72, (byte) 0x6F, (byte) 0x69, (byte) 0x64,
+        (byte) 0x43, (byte) 0x54, (byte) 0x53, (byte) 0x46, (byte) 0xC1, (byte) 0x14,
+        (byte) 0x55, (byte) 0x28, (byte) 0xCA, (byte) 0x82, (byte) 0x6D, (byte) 0xA4,
+        (byte) 0x9D, (byte) 0x0D, (byte) 0x73, (byte) 0x29, (byte) 0xF8, (byte) 0x11,
+        (byte) 0x74, (byte) 0x81, (byte) 0xCC, (byte) 0xB2, (byte) 0x7B, (byte) 0x88,
+        (byte) 0x33, (byte) 0xAA, (byte) 0xE3, (byte) 0x03, (byte) 0xD0, (byte) 0x01,
         (byte) 0x01
     };
 
@@ -112,7 +1019,6 @@ public class AramApplet extends Applet {
     private short mDataOffset = 0;
 
     private short mRemainingData = 0;
-    private boolean mIsGetDataAllInProgress = false;
 
     private AramApplet() {
     }
@@ -175,7 +1081,6 @@ public class AramApplet extends Applet {
                 }
                 switch (Util.getShort(buffer, (short) ISO7816.OFFSET_P1)) {
                     case GET_DATA_ALL:
-                        mIsGetDataAllInProgress = true;
                         mRemainingData = (short) RESPONSE_ALL_REF_AR_DO.length;
                         initiateOutgoingCase2(apdu, RESPONSE_ALL_REF_AR_DO, (short) 0);
                         break;
@@ -232,7 +1137,7 @@ public class AramApplet extends Applet {
         apdu.setOutgoingLength(expected);
         apdu.sendBytesLong(mOutgoingData, mDataOffset, expected);
 
-        if (!mIsGetDataAllInProgress) {
+        if (command[ISO7816.OFFSET_INS] != INS_GET_DATA) {
             if (((remaining -= expected) > 0) && (expected == DATA_BUFFER_SIZE)) {
                 mDataOffset += expected;
                 // Return SW 61xx if remaining outgoing data exists after sending outgoing data.
@@ -267,9 +1172,6 @@ public class AramApplet extends Applet {
         }
         if (mDataOffset != 0) {
             mDataOffset = 0;
-        }
-        if (mIsGetDataAllInProgress) {
-            mIsGetDataAllInProgress = false;
         }
     }
 }
